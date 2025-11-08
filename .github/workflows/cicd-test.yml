@@ -7,7 +7,7 @@ on:
       - synchronize
       - reopened
     paths:
-      - .github/configs/*/*.yml
+      - .github/configs/**/*.yml
 
 env:
   IMAGE_DESCRIPTION: Built by GitHub Actions, the associated workflow is https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
@@ -59,7 +59,12 @@ jobs:
           echo "repo=$(yq e '.repo' $file)" >> $GITHUB_OUTPUT
           echo "ref=$(yq e '.ref' $file)" >> $GITHUB_OUTPUT
           echo "image_name=$(yq e '.image_name' $file)" >> $GITHUB_OUTPUT
-          echo "image_tag=$(yq e '.image_tag' $file)" >> $GITHUB_OUTPUT
+
+          image_tag_prefix=$(yq e '.image_tag_prefix // ""' $file)
+          image_tag=$(yq e '.image_tag' $file)
+          full_image_tag="${image_tag_prefix}${image_tag}"
+
+          echo "image_tag=$full_image_tag" >> $GITHUB_OUTPUT
           echo "build_context=$(yq e '.build_context' $file)" >> $GITHUB_OUTPUT
           echo "dockerfile=$(yq e '.dockerfile' $file)" >> $GITHUB_OUTPUT
           echo "architectures=$(yq e '.architectures' $file)" >> $GITHUB_OUTPUT
