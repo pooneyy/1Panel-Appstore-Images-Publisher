@@ -49,8 +49,13 @@ jobs:
         id: updated-files
         run: |
           # 当触发工作流的事件为 pull_request 时，github.sha 值为 github.ref 分支上的最后一次合并提交
-          file=$( git diff-tree --no-commit-id --name-only -r ${{ github.event.pull_request.head.sha }} )
-          echo "file=$file" >> $GITHUB_OUTPUT
+          files=$( git diff-tree --no-commit-id --name-only -r ${{ github.event.pull_request.head.sha }} )
+          echo "$files" | while IFS= read -r file; do
+            if [[ "$file" == *.yml ]]; then
+              echo "file=$file" >> $GITHUB_OUTPUT
+              break
+            fi
+          done
 
       - name: 读取镜像构建配置文件
         id: read-config-file
